@@ -1,0 +1,11 @@
+[versions]
+kotest = "5.9.1"
+
+[libraries]
+hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version = "9.0.1.Final" }
+kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "7.0.13" }
+mockk-lib = { module = "io.mockk:mockk", version = "1.14.5" }
+mockk-spring = { module = "com.ninja-squad:springmockk", version = "4.0.2" }
+kotest-runner = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-spring = { module = "io.kotest.extensions:kotest-extensions-spring", version = "1.1.2" }
