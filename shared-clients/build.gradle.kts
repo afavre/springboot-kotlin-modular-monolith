@@ -6,18 +6,8 @@ plugins {
 }
 
 dependencies {
-    api(project(":shared-domains"))
-    api(project(":shared-clients"))
-
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-
-    // Validation
-    implementation("jakarta.validation:jakarta.validation-api")
-    implementation(libs.hibernate.validator)
-
+    api(project(":shared-domains"))
     // Tools
     implementation(libs.kotlin.logging)
 

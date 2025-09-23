@@ -13,14 +13,5 @@ dependencies {
 
     implementation(project(":accounts"))
 
-    testImplementation(libs.mockk.lib)
-    testImplementation(libs.mockk.spring)
-
-    testImplementation(libs.kotest.runner)
-    testImplementation(libs.kotest.assertions)
-    testImplementation(libs.kotest.spring)
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "junit")
-    }
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

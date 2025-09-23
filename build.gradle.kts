@@ -22,7 +22,11 @@ subprojects {
         }
     }
 
-    tasks.withType<Test> { finalizedBy("jacocoTestReport") }
+    tasks.withType<Test> {
+        useJUnitPlatform()
+        finalizedBy("jacocoTestReport")
+    }
+
 
     tasks.withType<JacocoReport> {
         reports {
