@@ -7,9 +7,9 @@ microservices.
 
 ## 🚀 Overview
 
-This project demonstrates a way to build an MVP when domain boundaries are still emerging**.  
-Start with a **modular monolith**—not microservices—using clean architecture principles, so you can break it down into
-independent services later if needed.
+This project demonstrates a way to build an MVP when domain boundaries are still emerging.  
+Start with a modular monolith using clean architecture principles, so you can break it down into
+independent microservices later if needed.
 The project uses a simplified version of the Hexagonal/Domain Driven Architecture pattern to keep the Core Business
 logic clear of the Framework used.
 
@@ -21,30 +21,23 @@ logic clear of the Framework used.
 
 Notes:
 
-- This setup is more complex than a typical Spring Boot App, with a single Gradle module, but it is simpler and more
+- This setup is more complex than a typical Spring Boot App with a single Gradle module, but it is simpler and more
   cost-effective than creating multiple microservices while boundaries are still evolving.
 - If using Java, you can use the module visibility feature to enforce boundaries. But with Kotlin, it is harder to
   enforce, so using Gradle modules is safer.
 
 ---
 
-## Architecture
+## 💡 Why Modular Monolith First?
 
-The "simplified" Hexagonal Architecture helps separate the core business logic from the framework and infrastructure
-code.
-Each module follows this pattern:
+- **Rapid MVP delivery** without premature network overhead.
+- **Domain boundaries can evolve naturally**—not locked by microservice APIs.
+- **Easier refactoring**: Move code between modules as you learn.
+- **When ready, break out modules as microservices** with minimal changes.
 
-- api: Controllers/APIs
-- config: Configuration classes (Framework related, wiring everything together)
-- domain: Business logic, domain models, services, repositories interfaces
-- infrastructure: Implementations of repository interfaces, external service clients, etc.
+---
 
-It is important to note that the `domain` layer does not depend on any other layers, ensuring a clean separation of
-concerns.
-The domain layer should be tested with unit tests only, while the `api` and `infrastructure` layers will mostly have
-integration tests.
-
-## Project Structure
+## 🗂 Project Structure
 
 - **Main Application**: Wires together modules, acts as the entry point.
 - **Feature Modules**: Each module owns its domain logic and only exposes client interfaces.
@@ -62,16 +55,30 @@ root/
 ├── e2e-tests/        # E2E Tests for all modules
 ```
 
----
+In this example, the **accounts** module provides a complete example of a feature module with its own domain logic, API,
+in
+memory persistence and the different layers of testing.
 
-## 💡 Why Modular Monolith First?
+The **activities** module is a simplified version to show how to interact with another module via a client interface.
 
-- **Rapid MVP delivery** without premature network overhead.
-- **Domain boundaries can evolve naturally**—not locked by microservice APIs.
-- **Easier refactoring**: Move code between modules as you learn.
-- **When ready, break out modules as microservices** with minimal changes.
 
 ---
+
+## 🏛 Architecture
+
+This "simplified" Hexagonal Architecture helps separate the core business logic from the framework and infrastructure
+code.
+Each modules follow this pattern:
+
+- api: Controllers/APIs
+- config: Configuration classes (SpringBoot related, wiring everything together)
+- domain: Business logic, domain models, services, repositories interfaces
+- infrastructure: Implementations of repository interfaces, external service clients, etc.
+
+It is important to note that the `domain` layer does not depend on any other layers, ensuring a clean separation of
+concerns.
+The domain layer should be tested with unit tests only, while the `api` and `infrastructure` layers will mostly have
+integration tests.
 
 ## 🛠️ Tech Stack
 
