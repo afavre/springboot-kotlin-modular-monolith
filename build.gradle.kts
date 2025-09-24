@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.spring.dependency.management) apply false
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.spring) apply false
+    alias(libs.plugins.spotless) apply false
 }
 
 allprojects {
@@ -14,6 +15,7 @@ allprojects {
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
+    apply(plugin = "com.diffplug.spotless")
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
         compilerOptions {
@@ -27,11 +29,21 @@ subprojects {
         finalizedBy("jacocoTestReport")
     }
 
-
     tasks.withType<JacocoReport> {
         reports {
             xml.required.set(true)
             html.required.set(true)
+        }
+    }
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            target("src/**/*.kt")
+            ktlint()
+        }
+        kotlinGradle {
+            target("*.gradle.kts")
+            ktlint()
         }
     }
 }

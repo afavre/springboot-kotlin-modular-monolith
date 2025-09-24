@@ -20,12 +20,12 @@ import org.springframework.test.web.servlet.post
 @WebMvcTest(controllers = [AccountController::class])
 @ContextConfiguration(classes = [AccountController::class, AccountService::class])
 class AccountControllerTest : FunSpec() {
-
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @MockkBean
     private lateinit var service: AccountService
+
     @MockkBean
     private lateinit var validator: AccountValidator
 
@@ -33,7 +33,7 @@ class AccountControllerTest : FunSpec() {
         extension(SpringExtension)
 
         test(
-            "Given a valid account, when POST /accounts is called, then it should create the account"
+            "Given a valid account, when POST /accounts is called, then it should create the account",
         ) {
             val accountDto = AccountDto(firstName = "Test Account", email = "john.doe@example.com")
             val account: Account = accountDto.toDomain()
@@ -45,14 +45,12 @@ class AccountControllerTest : FunSpec() {
                     contentType = MediaType.APPLICATION_JSON
                     content =
                         """
-                    {
-                        "firstName": "Test Account",
-                        "email":"john.doe@example.com"
-                    }
-                """
-                            .trimIndent()
-                }
-                .andDo { print() }
+                        {
+                            "firstName": "Test Account",
+                            "email":"john.doe@example.com"
+                        }
+                        """.trimIndent()
+                }.andDo { print() }
                 .andExpect {
                     status { isCreated() }
                     jsonPath("$.firstName") { value("Test Account") }
@@ -62,7 +60,7 @@ class AccountControllerTest : FunSpec() {
         }
 
         test(
-            "Given an existing account, when GET /accounts/{id} is called, then it should return the account"
+            "Given an existing account, when GET /accounts/{id} is called, then it should return the account",
         ) {
             val accountDto =
                 AccountDto(
@@ -76,8 +74,7 @@ class AccountControllerTest : FunSpec() {
             val expectedResult =
                 """
                 {"id":"1","firstName":"John","lastName":"Doe","email":"john.doe@example.com"}
-                """
-                    .trimIndent()
+                """.trimIndent()
 
             mockMvc
                 .get("/accounts/1")
@@ -89,7 +86,7 @@ class AccountControllerTest : FunSpec() {
         }
 
         test(
-            "Given a non-existing account, when GET /accounts/{id} is called, then it should return 404"
+            "Given a non-existing account, when GET /accounts/{id} is called, then it should return 404",
         ) {
             every { service.getAccountById("999") } returns null
 
@@ -102,20 +99,17 @@ class AccountControllerTest : FunSpec() {
                 {
                     "firstName": "Test Account"
                 }
-                """
-                    .trimIndent()
+                """.trimIndent()
 
             val expectedResult =
                 """
-                    {"error": "Validation failed","details": {"email": "Email must not be blank"}}
-                """
-                    .trimIndent()
+                {"error": "Validation failed","details": {"email": "Email must not be blank"}}
+                """.trimIndent()
             mockMvc
                 .post("/accounts") {
                     contentType = MediaType.APPLICATION_JSON
                     content = accountJson
-                }
-                .andDo { print() }
+                }.andDo { print() }
                 .andExpect {
                     status {
                         isBadRequest()
@@ -125,14 +119,14 @@ class AccountControllerTest : FunSpec() {
         }
 
         test(
-            "Given an existing account, when DELETE /accounts/{id} is called, then it should delete the account"
+            "Given an existing account, when DELETE /accounts/{id} is called, then it should delete the account",
         ) {
             every { service.deleteAccount("1") } returns true
             mockMvc.delete("/accounts/1").andDo { print() }.andExpect { status { isNoContent() } }
         }
 
         test(
-            "Given a non-existing account, when DELETE /accounts/{id} is called, then it should return 404"
+            "Given a non-existing account, when DELETE /accounts/{id} is called, then it should return 404",
         ) {
             every { service.deleteAccount("999") } returns false
             mockMvc.delete("/accounts/999").andDo { print() }.andExpect { status { isNotFound() } }

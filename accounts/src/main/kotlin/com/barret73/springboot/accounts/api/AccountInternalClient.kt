@@ -5,8 +5,7 @@ import com.barret73.springboot.client.AccountClient
 import com.barret73.springboot.domain.Account
 
 class AccountInternalClient(
-    private val accountService: AccountService
+    private val accountService: AccountService,
 ) : AccountClient {
-    override fun retrieveAccount(accountId: String): Account? =
-        accountService.getAccountById(accountId)
+    override fun retrieveAccount(accountId: String): Account? = accountService.getAccountById(accountId)
 }

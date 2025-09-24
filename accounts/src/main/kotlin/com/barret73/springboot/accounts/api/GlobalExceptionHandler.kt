@@ -11,11 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 // TODO should be moved to a shared module
 @ControllerAdvice
 class GlobalExceptionHandler {
-
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleValidationExceptions(
-        ex: MethodArgumentNotValidException
-    ): ResponseEntity<Map<String, Any>> {
+    fun handleValidationExceptions(ex: MethodArgumentNotValidException): ResponseEntity<Map<String, Any>> {
         val errors =
             ex.bindingResult.fieldErrors.associate {
                 it.field to (it.defaultMessage ?: "Invalid value")
@@ -25,9 +22,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handleHttpMessageNotReadable(
-        ex: HttpMessageNotReadableException
-    ): ResponseEntity<Map<String, Any>> {
+    fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException): ResponseEntity<Map<String, Any>> {
         val rawMessage =
             ex.cause?.localizedMessage ?: ex.localizedMessage ?: "Malformed JSON request"
         val missingFieldRegex = Regex("""JSON property (\w+) due to missing""")

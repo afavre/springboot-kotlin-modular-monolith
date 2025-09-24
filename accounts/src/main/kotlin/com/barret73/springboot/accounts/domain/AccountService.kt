@@ -3,7 +3,10 @@ package com.barret73.springboot.accounts.domain
 import com.barret73.springboot.accounts.config.logger
 import com.barret73.springboot.domain.Account
 
-class AccountService(private val repo: AccountRepository, private val idGenerator: IdGenerator) {
+class AccountService(
+    private val repo: AccountRepository,
+    private val idGenerator: IdGenerator,
+) {
     fun createAccount(account: Account): Account {
         if (repo.existsByEmail(account.email)) {
             logger.warn { "Email ${account.email} already exists" }
@@ -19,7 +22,10 @@ class AccountService(private val repo: AccountRepository, private val idGenerato
 
     fun getAllAccounts(): List<Account> = repo.findAll()
 
-    fun updateAccount(id: String, account: Account): Account? {
+    fun updateAccount(
+        id: String,
+        account: Account,
+    ): Account? {
         val existing = repo.findById(id) ?: return null
         if (existing.email != account.email && repo.existsByEmail(account.email)) {
             logger.warn { "Email ${account.email} already exists" }

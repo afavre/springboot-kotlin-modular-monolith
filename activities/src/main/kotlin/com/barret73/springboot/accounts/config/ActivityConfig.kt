@@ -7,12 +7,6 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class ActivityConfig {
-
     @Bean
-    fun activityService(
-        accountClient: AccountClient,
-    ): ActivityService {
-        return ActivityService(accountClient)
-    }
-
+    fun activityService(accountClient: AccountClient): ActivityService = ActivityService(accountClient)
 }

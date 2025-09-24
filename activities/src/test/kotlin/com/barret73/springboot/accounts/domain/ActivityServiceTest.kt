@@ -10,7 +10,7 @@ import io.mockk.verify
 class ActivityServiceTest :
     FunSpec({
         test(
-            "Given a valid account, when createActivity is called, then it should create the activity"
+            "Given a valid account, when createActivity is called, then it should create the activity",
         ) {
             // Mock the AccountClient
             val accountClient = mockk<com.barret73.springboot.client.AccountClient>()
@@ -23,6 +23,5 @@ class ActivityServiceTest :
             activity.accountId shouldBe "1"
             activity.description shouldBe "Test Activity"
             verify(exactly = 1) { accountClient.retrieveAccount("1") }
-
         }
     })

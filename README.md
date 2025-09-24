@@ -98,6 +98,7 @@ integration tests.
 
 - Gradle Version Catalog: Centralized dependency management (inside the project)
 - Makefile
+- Spotless (Ktlint formater - install it on your IDE if you want to auto-format code)
 
 ## 🧪 Testing & Coverage
 

@@ -11,28 +11,18 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class AccountConfig {
+    @Bean
+    fun idGenerator(): IdGenerator = IdGenerator()
 
     @Bean
-    fun idGenerator(): IdGenerator {
-        return IdGenerator()
-    }
-
-    @Bean
-    fun accountRepository(): AccountRepository {
-        return InMemoryAccountRepository()
-    }
+    fun accountRepository(): AccountRepository = InMemoryAccountRepository()
 
     @Bean
     fun accountService(
         accountRepository: AccountRepository,
         idGenerator: IdGenerator,
-    ): AccountService {
-        return AccountService(accountRepository, idGenerator)
-    }
+    ): AccountService = AccountService(accountRepository, idGenerator)
 
     @Bean
-    fun accountClient(accountService: AccountService): AccountClient {
-        return AccountInternalClient(accountService)
-    }
-    
+    fun accountClient(accountService: AccountService): AccountClient = AccountInternalClient(accountService)
 }

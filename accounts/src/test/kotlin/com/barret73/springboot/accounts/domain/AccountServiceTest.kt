@@ -13,7 +13,7 @@ import io.mockk.verify
 class AccountServiceTest :
     FunSpec({
         test(
-            "Given an account with a non existing email, when createAccount is called, then it should create the account and generate an ID"
+            "Given an account with a non existing email, when createAccount is called, then it should create the account and generate an ID",
         ) {
             val idGenerator = mockk<IdGenerator>()
             val repository = mockk<AccountRepository>()
@@ -38,7 +38,7 @@ class AccountServiceTest :
         }
 
         test(
-            "Given an account with an existing email, when createAccount is called, then it should throw an exception"
+            "Given an account with an existing email, when createAccount is called, then it should throw an exception",
         ) {
             val idGenerator = mockk<IdGenerator>()
             val repository = mockk<AccountRepository>()

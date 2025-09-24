@@ -6,6 +6,7 @@ spring-boot = { id = "org.springframework.boot", version = "3.5.5" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.20" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version = "2.2.20" }
 spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.7" }
+spotless = { id = "com.diffplug.spotless", version = "7.2.1" }
 
 [libraries]
 hibernate-validator = { module = "org.hibernate.validator:hibernate-validator", version = "9.0.1.Final" }
