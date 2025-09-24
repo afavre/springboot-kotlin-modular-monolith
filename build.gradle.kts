@@ -1,25 +1,49 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.5.31"
-    id("org.springframework.boot") version "2.5.4"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("plugin.spring") version "1.5.31"
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spring.dependency.management) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.spring) apply false
+    alias(libs.plugins.spotless) apply false
 }
 
-repositories {
-    mavenCentral()
+allprojects {
+    group = "com.example"
+    version = "0.0.1-SNAPSHOT"
+    repositories { mavenCentral() }
 }
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    testImplementation("io.kotest:kotest-runner-junit5:5.0.0")
-    testImplementation("io.kotest:kotest-assertions-core:5.0.0")
-}
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "jacoco")
+    apply(plugin = "com.diffplug.spotless")
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        jvmTarget = "1.8"
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.add("-Xjsr305=strict")
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+        finalizedBy("jacocoTestReport")
+    }
+
+    tasks.withType<JacocoReport> {
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+        }
+    }
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            target("src/**/*.kt")
+            ktlint()
+        }
+        kotlinGradle {
+            target("*.gradle.kts")
+            ktlint()
+        }
     }
 }
