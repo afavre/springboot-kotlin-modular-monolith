@@ -2,9 +2,9 @@ package com.barret73.springboot.accounts.api
 
 import com.barret73.springboot.accounts.api.dto.AccountDto
 import com.barret73.springboot.accounts.api.dto.toDomain
-import com.barret73.springboot.accounts.config.logger
 import com.barret73.springboot.accounts.domain.AccountService
 import com.barret73.springboot.domain.Account
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -24,6 +24,8 @@ class AccountController(
     private val accountService: AccountService,
     private val accountValidator: AccountValidator,
 ) {
+    val logger = KotlinLogging.logger {}
+
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun create(
         @Valid @RequestBody account: AccountDto,
