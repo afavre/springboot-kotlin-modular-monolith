@@ -1,16 +1,20 @@
 package com.barret73.springboot.accounts.api
 
-import com.barret73.springboot.accounts.config.logger
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.servlet.NoHandlerFoundException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 // TODO should be moved to a shared module
 @ControllerAdvice
 class GlobalExceptionHandler {
+    val logger = KotlinLogging.logger {}
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationExceptions(ex: MethodArgumentNotValidException): ResponseEntity<Map<String, Any>> {
         val errors =
@@ -37,6 +41,9 @@ class GlobalExceptionHandler {
         val responseBody = mapOf("error" to "Malformed request", "details" to userMessage)
         return ResponseEntity(responseBody, HttpStatus.BAD_REQUEST)
     }
+
+    @ExceptionHandler(NoResourceFoundException::class, NoHandlerFoundException::class)
+    fun handleNoResourceFound(ex: NoResourceFoundException): ResponseEntity<String> = ResponseEntity.notFound().build()
 
     @ExceptionHandler(Exception::class)
     fun handleGenericException(ex: Exception): ResponseEntity<Map<String, Any>> {

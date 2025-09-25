@@ -1,12 +1,14 @@
 package com.barret73.springboot.accounts.domain
 
-import com.barret73.springboot.accounts.config.logger
 import com.barret73.springboot.domain.Account
+import io.github.oshai.kotlinlogging.KotlinLogging
 
 class AccountService(
     private val repo: AccountRepository,
     private val idGenerator: IdGenerator,
 ) {
+    val logger = KotlinLogging.logger {}
+
     fun createAccount(account: Account): Account {
         if (repo.existsByEmail(account.email)) {
             logger.warn { "Email ${account.email} already exists" }
