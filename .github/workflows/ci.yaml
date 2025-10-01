@@ -1,0 +1,148 @@
+name: Build & Push Docker to ECR, Create Release
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build-push-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+      packages: write
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      ECR_REPO: ${{ secrets.ECR_REPO }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Corretto)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Build Spring Boot JAR with Gradle
+        run: ./gradlew build -x test
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Only run SemVer logic if on main
+      - name: Determine semver bump type and PR title from last PR
+        id: pr_info
+        if: github.ref == 'refs/heads/main'
+        run: |
+          LAST_PR=$(gh pr list --state merged --base main --limit 1 --json number,title -q '.[0]')
+          PR_NUMBER=$(echo "$LAST_PR" | jq -r '.number')
+          PR_TITLE=$(echo "$LAST_PR" | jq -r '.title')
+          PR_LABELS=$(gh pr view $PR_NUMBER --json labels -q '.labels[].name')
+          bump_type=""
+          for label in $PR_LABELS; do
+            if [[ "$label" == "major" || "$label" == "minor" || "$label" == "patch" ]]; then
+              bump_type="$label"
+            fi
+          done
+          if [[ -z "$bump_type" ]]; then
+            echo "❌ ERROR: PR must have one of the labels: major, minor, or patch"
+            exit 1
+          fi
+          echo "bump_type=$bump_type" >> $GITHUB_OUTPUT
+          echo "pr_title=$PR_TITLE" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get current semver version
+        id: get_ver
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if [ -f VERSION ]; then
+            version=$(cat VERSION)
+          else
+            version="0.0.0"
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        id: bump_ver
+        if: github.ref == 'refs/heads/main'
+        run: |
+          OLD_VERSION="${{ steps.get_ver.outputs.version }}"
+          BUMP_TYPE="${{ steps.pr_info.outputs.bump_type }}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$OLD_VERSION"
+          case "$BUMP_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "$NEW_VERSION" > VERSION
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit and push VERSION update
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add VERSION
+          git commit -m "ci: bump version to ${{ steps.bump_ver.outputs.new_version }}"
+          git push
+
+      - name: Set Docker tag for branch
+        id: branch_tag
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "docker_tag=${GITHUB_SHA}.SNAPSHOT" >> $GITHUB_OUTPUT
+
+      - name: Set Docker tag for main
+        id: main_tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "docker_tag=${{ steps.bump_ver.outputs.new_version }}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t $ECR_REPO:${{ steps.main_tag.outputs.docker_tag || steps.branch_tag.outputs.docker_tag }} .
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push $ECR_REPO:${{ steps.main_tag.outputs.docker_tag || steps.branch_tag.outputs.docker_tag }}
+
+      - name: Tag latest (only on main)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker tag $ECR_REPO:${{ steps.main_tag.outputs.docker_tag }} $ECR_REPO:latest
+          docker push $ECR_REPO:latest
+
+      - name: Create Release (only on main)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "${{ steps.bump_ver.outputs.new_version }}"
+          name: "${{ steps.pr_info.outputs.pr_title }}"
+          body: "Release for ${{ steps.bump_ver.outputs.new_version }} from PR: ${{ steps.pr_info.outputs.pr_title }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
