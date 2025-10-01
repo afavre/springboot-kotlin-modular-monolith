@@ -7,8 +7,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.example"
-    version = "0.0.1-SNAPSHOT"
+    group = "com.barret73.springboot-kotlin"
     repositories { mavenCentral() }
 }
 
